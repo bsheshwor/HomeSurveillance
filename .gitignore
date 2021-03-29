@@ -143,5 +143,4 @@ cascades/
 
 #data files
 *.h5
-*.pkl
 *.pth
