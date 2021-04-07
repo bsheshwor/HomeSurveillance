@@ -3,6 +3,9 @@ import numpy as np
 import face_recognition
 import os
 from datetime import datetime
+import pandas as pd
+import numpy as np
+
 
 path = 'AttendImages'
 images = []
