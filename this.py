@@ -31,11 +31,13 @@ data = {
     'encodings':mylist
 }
 # appData.insert_one(data)
+
 faceData=[]
 for x in appData.find({},{ "_id": 0 }):
   faceData.append(x)
-
 # print((faceData[0]['encodings']))
+
+
 face1= np.zeros(128)
 for i in range(len(faceEncoding)):
     face1[i]=faceData[0]['encodings'][i]

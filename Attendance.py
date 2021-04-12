@@ -42,6 +42,7 @@ def markDetect(name):
 
 
 encodeListknown = findEncodings(images)
+print(encodeListknown)
 print("Encoding Complete")
 cap = cv2.VideoCapture(0)
 

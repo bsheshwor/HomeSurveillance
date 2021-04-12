@@ -5,32 +5,16 @@ import os
 from datetime import datetime
 import pandas as pd
 import numpy as np
+from pymongo import MongoClient
 
+# database connect
+client = MongoClient(port=27017)
+db= client.home_surveillance #database new
+appData= db.appData
 
-path = 'AttendImages'
-images = []
-classNames = []
-myList = os.listdir(path)
-print(myList)
-
-for cl in myList:
-    curImg = cv2.imread(f'{path}/{cl}')
-    images.append(curImg)
-    classNames.append(os.path.splitext(cl)[0])
-
-print(classNames)
-
-def findEncodings(images):
-    encodeList = []
-    for img in images:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        encode = face_recognition.face_encodings(img)[0]
-        encodeList.append(encode)
-
-    return encodeList
 
 def memberentry_record(name):
-    with open('memberEntry_record.csv', 'r+') as f:
+    with open('data.csv', 'r+') as f:
         myDataList = f.readlines()
         namelist = []
         for line in myDataList:
@@ -44,8 +28,23 @@ def memberentry_record(name):
             dtstring = now.strftime('%y:%m:%d:%H:%M:%S')
             f.writelines(f'\n{name},{dtstring}')
 
-encodeListKnown = findEncodings(images)
-print('Encoding Complete')
+
+
+faceData=[]
+for x in appData.find({},{ "_id": 0 }):
+  faceData.append(x)
+face = []
+# print((faceData[0]['encodings']))
+
+
+for i in range(len(faceData)):
+    face_arr = np.zeros(128)
+    for j in range(128):
+        face_arr[j]=faceData[i]['encodings'][j]
+    face.append(face_arr)
+
+
+print('Data Extraction Complete')
 cap = cv2.VideoCapture(0)
 
 while True:
@@ -57,23 +56,25 @@ while True:
     encodesCurFrame = face_recognition.face_encodings(imgS, facesCurFrame)
 
     for encodeFace, faceLoc in zip(encodesCurFrame, facesCurFrame):
-        matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
-        faceDist = face_recognition.face_distance(encodeListKnown, encodeFace)
-        print(matches)
+        matches = face_recognition.compare_faces(face, encodeFace)
+        faceDist = face_recognition.face_distance(face, encodeFace)
+        # print(matches)
         matchIndex = np.argmin(faceDist)
 
         if matches[matchIndex]:
-            name = classNames[matchIndex].upper()
-            print(name)
+            name = faceData[matchIndex]['name'].upper()
+            relation = faceData[matchIndex]['relation'].upper()
+            # print(name)
             y1,x2,y2,x1 = faceLoc
             y1, x2, y2, x1 = y1*4,x2*4,y2*4,x1*4
             cv2.rectangle(img, (x1,y1), (x2,y2), (0,255,0),2)
             cv2.rectangle(img, (x1,y2-35), (x2,y2), (0,255,0), cv2.FILLED)
             cv2.putText(img, name, (x1+6,y2-6), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 2)
+            cv2.putText(img, relation, (x1+50,y2+50), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 2)
             memberentry_record(name)
         else:
             name = 'Unknown'
-            print(name)
+            # print(name)
             y1, x2, y2, x1 = faceLoc
             y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
             cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
