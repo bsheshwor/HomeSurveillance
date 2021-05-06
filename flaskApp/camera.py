@@ -31,9 +31,34 @@ for i in range(len(faceData)):
 print('Data Extraction Complete')
 # cap = cv2.VideoCapture(0)
 
+class recordData(object):
+    def __init__(self):
+        self.address ="http://192.168.0.100:8080/video"
+        self.video = cv2.VideoCapture(self.address)
+        # self.video = cv2.VideoCapture(cv2.CAP_V4L2)
+
+    def __del__(self):
+        self.video.release()
+
+    def get_frame(self):
+        success, img = self.video.read()
+
+        # cv2.imshow('webcam', img)
+        cv2.waitKey(1)
+
+
+
+
+        ret, jpeg = cv2.imencode('.jpg', img)
+        return jpeg.tobytes()
+
+
+
 class VideoCamera(object):
     def __init__(self):
         self.video = cv2.VideoCapture(cv2.CAP_V4L2)
+        # self.address = "http://192.168.0.100:8080/video"
+        # self.video = cv2.VideoCapture(self.address)
 
     def __del__(self):
         self.video.release()
