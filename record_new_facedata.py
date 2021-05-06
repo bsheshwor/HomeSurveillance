@@ -33,9 +33,10 @@ while True:
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
 
     cv2.rectangle(frame, ((0, frame.shape[0] - 25)), (270, frame.shape[0]), (255, 255, 255), -1)
+    # if no face detect
     if(len(faces)==0):
         cv2.putText(frame, "NO Face DETECTED", (50,50), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
-
+    # if detected multiple faces
     if (len(faces) >1):
         cv2.putText(frame, "Multiple Faces Detected!! ", (50,50), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
     if not ret:
@@ -45,8 +46,8 @@ while True:
         cv2.imshow("Record", frame)
 
         k = cv2.waitKey(1)
-        if k % 256 == 27:
-            # ESC pressed
+        if k % 256 == 27:             # ESC pressed
+
             print("Escape hit, closing...")
             break
 
@@ -87,6 +88,3 @@ while True:
 cam.release()
 
 cv2.destroyAllWindows()
-
-
-

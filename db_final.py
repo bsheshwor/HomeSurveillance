@@ -30,13 +30,13 @@ def memberentry_record(name):
 
 
 
-faceData=[]
+faceData=[]   #contains the entire face data dict with name, relation and the corresponding enocdings
 for x in appData.find({},{ "_id": 0 }):
   faceData.append(x)
-face = []
+face = []  #it contains the list of arrays that are encodings of the face
 # print((faceData[0]['encodings']))
 
-
+# appending face encodings in list face
 for i in range(len(faceData)):
     face_arr = np.zeros(128)
     for j in range(128):
