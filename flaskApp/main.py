@@ -1,8 +1,26 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 from camera import recordData,VideoCamera
+import cv2
+from pymongo import MongoClient
+from datetime import datetime
+import numpy as np
+import face_recognition
+import os
 
 app = Flask(__name__)
 
+def insertDataToDb(name,relation,encodings):
+    client = MongoClient(port=27017)
+    db = client.home_surveillance  # database new
+
+    data = {
+        'name': name,
+        'relation': relation,
+        'encodings': encodings
+
+    }
+    appData = db.appData
+    appData.insert_one(data)
 
 def gen(camera):
     while True:
@@ -29,6 +47,38 @@ def indexindex():
 def recordrecord():
     return Response(gen(recordData()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/takeimage', methods = ['POST'])
+def takeimage():
+    name = request.form['name']
+    relation = request.form['relation']
+    print(type(name))
+    imgToSave = cv2.imread('t.jpeg')
+    now = datetime.now()
+    dtstring = now.strftime('%y%m%d%H%M%S')
+
+    img_name = "{}_{}.png".format(name, dtstring)
+    path = 'source'
+    cv2.imwrite(os.path.join(path, img_name), imgToSave)
+    print("{} written!".format(img_name))
+
+    #        compute the encodings of the facedata
+    img = face_recognition.load_image_file('t.jpeg')
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    faceLocation = face_recognition.face_locations(img)[0]
+    faceEncoding = face_recognition.face_encodings(img)[0]
+    cv2.rectangle(img, (faceLocation[3], faceLocation[0]), (faceLocation[1], faceLocation[2]), (255, 0, 255), 2)
+
+    encodingList = []
+
+    for i in range(len(faceEncoding)):
+        encodingList.append(faceEncoding[i])
+
+    insertDataToDb(name=name, relation=relation, encodings=encodingList)
+
+
+    return Response(status=200)
 
 
 

@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from pymongo import MongoClient
 
-# face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
+face_cascade = cv2.CascadeClassifier('models/haarcascade_frontalface_default.xml')
 # ds_factor = 0.6
 client = MongoClient(port=27017)
 db= client.home_surveillance #database new
@@ -42,8 +42,15 @@ class recordData(object):
 
     def get_frame(self):
         success, img = self.video.read()
+        cv2.imwrite('t.jpeg',img)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # cv2.imshow('webcam', img)
+        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+        for (x, y, w, h) in faces:
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
+
+        cv2.rectangle(img, ((0, img.shape[0] - 25)), (270, img.shape[0]), (255, 255, 255), -1)
+
         cv2.waitKey(1)
 
 
