@@ -28,28 +28,31 @@ def gen(camera):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
-@app.route('/new')
+@app.route('/')
 def index():
     return render_template('index.html')
 
 
-@app.route('/new/record')
+@app.route('/video')
 def video_feed():
     return Response(gen(VideoCamera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/newnew')
+@app.route('/record')
 def indexindex():
     return render_template('record.html')
 
 
-@app.route('/newnew/record')
+@app.route('/')
 def recordrecord():
     return Response(gen(recordData()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/takeimage', methods = ['POST'])
 def takeimage():
+    # num = recordData().no_of_faces
+    # if num ==1:
+    #     print('Running hEre')
     name = request.form['name']
     relation = request.form['relation']
     print(type(name))
@@ -76,9 +79,12 @@ def takeimage():
         encodingList.append(faceEncoding[i])
 
     insertDataToDb(name=name, relation=relation, encodings=encodingList)
-
+    os.remove('t.jpeg')
 
     return Response(status=200)
+# else:
+    #     return  Response(status=400)
+    # print('Runiing sdklasdjasl;djas')
 
 
 

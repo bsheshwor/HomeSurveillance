@@ -33,16 +33,20 @@ print('Data Extraction Complete')
 
 class recordData(object):
     def __init__(self):
-        self.address ="http://192.168.0.100:8080/video"
-        self.video = cv2.VideoCapture(self.address)
-        # self.video = cv2.VideoCapture(cv2.CAP_V4L2)
+        # self.address ="http://192.168.0.100:8080/video"
+        # self.video = cv2.VideoCapture(self.address)
+        self.video = cv2.VideoCapture(1)
+        self.no_of_faces = 0
 
     def __del__(self):
         self.video.release()
 
+    def getFaces(self):
+        return self.no_of_faces
+
     def get_frame(self):
         success, img = self.video.read()
-        cv2.imwrite('t.jpeg',img)
+        # cv2.imwrite('t.jpeg',img)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         faces = face_cascade.detectMultiScale(gray, 1.1, 4)
@@ -50,6 +54,16 @@ class recordData(object):
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
 
         cv2.rectangle(img, ((0, img.shape[0] - 25)), (270, img.shape[0]), (255, 255, 255), -1)
+        self.no_of_faces = len(faces)
+        if (self.no_of_faces==1):
+            cv2.imwrite('t.jpeg', img)
+
+        # if no face detect
+        if (self.no_of_faces==0):
+            cv2.putText(img, "NO Face DETECTED", (50, 50), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
+        # if detected multiple faces
+        if (self.no_of_faces > 1):
+            cv2.putText(img, "Multiple Faces Detected!! ", (50, 50), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
 
         cv2.waitKey(1)
 
@@ -63,9 +77,9 @@ class recordData(object):
 
 class VideoCamera(object):
     def __init__(self):
-        self.video = cv2.VideoCapture(cv2.CAP_V4L2)
-        # self.address = "http://192.168.0.100:8080/video"
-        # self.video = cv2.VideoCapture(self.address)
+        # self.video = cv2.VideoCapture(1)
+        self.address = "http://192.168.0.100:8080/video"
+        self.video = cv2.VideoCapture(self.address)
 
     def __del__(self):
         self.video.release()
