@@ -47,7 +47,7 @@ def memberentry_record(name):
             count+=1
             email_alert("Security Alert!!", "Someone just trespassed your property!! ", "shresthanaruto97@gmail.com")             
             for i in range(5):
-                i = playsound('ALert.wav')
+                i = playsound('source/ALert.wav')
         
 
 faceData=[]
