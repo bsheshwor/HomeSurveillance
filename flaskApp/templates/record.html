@@ -1,0 +1,29 @@
+<html>
+  <head>
+
+    <title>Record New Face</title>
+  </head>
+  <body>
+    <h1>Page for recording new face data</h1>
+    <img src="{{ url_for('recordrecord') }}">
+     <input id="input" type="text" name="fname"><br>
+     <input id="relation" type="text" name="fname"><br>
+     <button onclick="myFunction()" type="button">Submit</button>
+     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+     <script>
+function myFunction() {
+  var name = document.getElementById("input").value;
+  var relation = document.getElementById("relation").value;
+  console.log(name);
+  $.post("/takeimage",
+   {
+     name: name,
+     relation: relation
+   },
+   function(data, status){
+     alert("Data: " + data + "\nStatus: " + status);
+   });
+}
+</script>
+  </body>
+</html>
