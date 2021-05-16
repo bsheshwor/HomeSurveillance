@@ -35,7 +35,7 @@ class recordData(object):
     def __init__(self):
         # self.address ="http://192.168.0.100:8080/video"
         # self.video = cv2.VideoCapture(self.address)
-        self.video = cv2.VideoCapture(1)
+        self.video = cv2.VideoCapture(0)
         self.no_of_faces = 0
 
     def __del__(self):

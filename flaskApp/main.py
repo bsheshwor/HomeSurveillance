@@ -43,7 +43,7 @@ def indexindex():
     return render_template('record.html')
 
 
-@app.route('/')
+@app.route('/record/new')
 def recordrecord():
     return Response(gen(recordData()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
