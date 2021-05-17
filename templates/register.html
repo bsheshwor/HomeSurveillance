@@ -1,0 +1,47 @@
+{% extends 'base.html'%}
+
+{% block content %}
+
+<link rel="stylesheet" href="static/css/master.css">
+<body>
+  <div class="container_a">
+    <div class="title">Registration</div>
+    <div class="content">
+      <form action="#" method="POST">
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Full Name</span>
+            <input type="text" name="fullname" placeholder="Enter your name" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Email address</span>
+            <input type="text" name="email" placeholder="Enter your email" required>
+          </div>
+        
+          <div class="input-box">
+            <span class="details">Password</span>
+            <input type="password" name="password1" placeholder="Enter your password" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Confirm Password</span>
+            <input type="password" name="password2" placeholder="Confirm your password" required>
+          </div>
+          {% if message  %}
+          <div class="input-box">
+              <p>{{ message }}</p>
+          </div>
+          {% endif %}
+        </div>
+        <div class="button">
+          <input type="submit" value="Register">
+        </div>
+        <div class="button" style="text-align: center;">
+          <p>Already have an account? <a href="login">Sign in</a>.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+
+{% endblock %}

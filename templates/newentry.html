@@ -1,0 +1,33 @@
+{% extends 'base.html'%}
+
+{% block content %}
+     
+<link rel="stylesheet" href="static/css/master.css">
+     
+<body>
+  <div class="container">
+    <div class="title">New Data Register</div>
+    <div class="content">
+      <form action="#" method="POST">
+        <div class="user-details">
+
+          <div class="input-box">
+            <span class="details">Enter Your Name</span>
+            <input type="text" name="name" placeholder="Enter your name" required>
+          </div>
+        
+          <div class="input-box">
+            <span class="details">Relation With The Owner</span>
+            <input type="text" name="text" placeholder="Enter your relation" required>
+          </div>
+        </div>
+        <div class="button">
+          <input type="submit" href="base.html" value="Submit">
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+
+{% endblock %}

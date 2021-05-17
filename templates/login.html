@@ -1,0 +1,42 @@
+{% extends 'base.html'%}
+
+{% block content %}
+     
+<link rel="stylesheet" href="static/css/master.css">
+     
+<body>
+  <div class="container">
+    <div class="title">Login</div>
+    <div class="content">
+      <form action="#" method="POST">
+        <div class="user-details">
+
+          <div class="input-box">
+            <span class="details">Email</span>
+            <input type="text" name="email" placeholder="Enter your email" required>
+          </div>
+        
+          <div class="input-box">
+            <span class="details">Password</span>
+            <input type="password" name="password" placeholder="Enter your password" required>
+          </div>
+        </div>
+        <div class="button">
+          <input type="submit" href="logged_in" value="Login">
+        </div>
+        {% if message  %}
+        <div class="button">
+            <p>{{ message }}</p>
+        </div>
+        {% endif %}
+        <div class="button" style="text-align: center;">
+          <p>Not Registered? <a href="register">Register Here</a></p>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+
+</body>
+
+{% endblock %}
