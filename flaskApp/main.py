@@ -8,11 +8,11 @@ import face_recognition
 import os
 
 app = Flask(__name__)
+client = MongoClient(port=27017)
+db = client.home_surveillance
 
 def insertDataToDb(name,relation,encodings):
-    client = MongoClient(port=27017)
-    db = client.home_surveillance  # database new
-
+    
     data = {
         'name': name,
         'relation': relation,
