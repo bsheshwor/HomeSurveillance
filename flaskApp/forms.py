@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, FileField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from models import User
 
 class RegistrationForm(FlaskForm):
     """Registration Form"""
@@ -36,3 +37,14 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators = [DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+class MemberDataForm(FlaskForm):
+    """
+    Form for admin to add or edit the data
+    """
+    name = StringField('Name', validators=[DataRequired])
+    relation = StringField('Relation', validators=[DataRequired] )
+    image = FileField('Image File', validators=[DataRequired])
+    submit = SubmitField('Submit')
+
+

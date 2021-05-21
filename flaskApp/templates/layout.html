@@ -20,7 +20,7 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/">Flask Blog</a>
+          <a class="navbar-brand mr-4" href="/">Home Surveillance</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -32,11 +32,15 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
                 {% if current_user.is authenticated %}
+                {% if current_user.is_admin%}
+                <a href="{{ url_for('list_members') }}">Members</a>
+                <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
                 <a class="nav-item nav-link" href="/account">Account</a>
                 <a class="nav-item nav-link" href="/logout">Logout</a>
                 {%else%}
               <a class="nav-item nav-link" href="/login">Login</a>
               <a class="nav-item nav-link" href="/register">Register</a>
+                {%endif%}
                 {%endif%}
             </div>
           </div>
