@@ -21,3 +21,12 @@ class Members(db.Document):
     name = db.StringField(required=True)
     relation = db.StringField(required=True)
     image_file = db.ImageField(required=True)
+
+#
+# def data(name, relation, encodings):
+#     data = {
+#         'name': name,
+#         'relation': relation,
+#         'encodings': encodings,
+#
+#     }
