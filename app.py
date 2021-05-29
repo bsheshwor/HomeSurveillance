@@ -12,8 +12,12 @@ records = db.records
 
 
 @app.route("/", methods=['post', 'get'])
-def bas():
-    return render_template('base.html')
+def base():
+    if "email" in session:
+        email = session["email"]
+        return render_template('base.html', email=email)
+    else:
+        return redirect(url_for("login"))
 
 @app.route("/index", methods=['post', 'get'])
 def index():
@@ -25,7 +29,7 @@ def index():
 def reg():
     message = ''
     if "email" in session:
-        return redirect(url_for("logged_in"))
+        return redirect(url_for("base"))
     if request.method == "POST":
         user = request.form.get("fullname")
         email = request.form.get("email")
@@ -55,20 +59,12 @@ def reg():
             return render_template('base.html', email=new_email)
     return render_template('register.html')
 
-@app.route('/logged_in')
-def logged_in():
-    if "email" in session:
-        email = session["email"]
-        return render_template('base.html', email=email)
-    else:
-        return redirect(url_for("login"))
-
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
     message = ''
     if "email" in session:
-        return redirect(url_for("logged_in"))
+        return redirect(url_for("base"))
 
     if request.method == "POST":
         email = request.form.get("email")
@@ -82,7 +78,7 @@ def login():
             
             if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
                 session["email"] = email_val
-                return redirect(url_for('logged_in'))
+                return redirect(url_for('base'))
             else:
                 if "email" in session:
                     return redirect(url_for("base.html"))
