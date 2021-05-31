@@ -33,7 +33,9 @@ class UserForm(form.Form):
 def base():
     if "email" in session:
         email = session["email"]
-        return render_template('base.html', email=email)
+        relation = session["relation"]
+
+        return render_template('base.html', email=email, relation=relation)
     else:
         return redirect(url_for("login"))
 
@@ -41,6 +43,7 @@ def base():
 def index():
     if "email" in session:
         email = session["email"]
+
         return render_template('index.html', email=email)
 
 @app.route("/register", methods=['post', 'get'])
@@ -53,7 +56,7 @@ def reg():
     if request.method == "POST":
         user = request.form.get("fullname")
         email = request.form.get("email")
-        relation = request.form.get("relation")
+        relation = "member"
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
@@ -98,9 +101,11 @@ def login():
         if email_found:
             email_val = email_found['email']
             passwordcheck = email_found['password']
-            print(passwordcheck)
+            relation = email_found['relation']
+
             if bcrypt.check_password_hash(passwordcheck,password):
                 session["email"] = email_val
+                session["relation"] = relation
                 return redirect(url_for('base'))
             else:
                 if "email" in session:
@@ -152,4 +157,4 @@ if __name__ == '__main__':
     admin.add_view(UserView(records, 'User'))
 
     # Start app
-    app.run(host='0.0.0.0',port='3030',debug=True)
+    app.run(host='0.0.0.0',port='1300',debug=True)

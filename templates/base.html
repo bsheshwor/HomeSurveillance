@@ -11,11 +11,16 @@
         <div class="logo">Video Streaming</div>
         <div class="navlinks">
             <ul>
-                {% if email %}
+
                 <li><a href="index">Home</a></li>
+                  {% if email %}
                 <li><a href="newentry">New Data</a></li>
                 <li><a href="csv">History</a></li>
+                {% if relation == "admin"%}
+                <li><a href="admin">Admin</a></li>
+                {%endif%}
                 <li><a href="signout">Logout</a></li>
+
                 {% else %}
                 <li><a href="register">Register</a></li>
                 <li><a href="login">Login</a></li>
@@ -23,7 +28,6 @@
             </ul>
         </div>
         <h4 style="color: azure;">Current User:{{email}}</h4>
-        
     </header>
     <section class="Form_container">
        {% block content %}
@@ -33,7 +37,7 @@
 
 
 <script src="static/js/app.js"></script>
-    
+
 
 </body>
 
