@@ -1,14 +1,32 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 import pymongo
-import bcrypt
-import csv
+from flask_bcrypt import Bcrypt
 
+from pymongo import MongoClient
+from datetime import datetime
+import os
+from bson.objectid import ObjectId
+import flask_admin as admin
+from wtforms import form, fields, validators
+from flask_admin.form import Select2Widget
+from flask_admin.contrib.pymongo import ModelView, filters
+from flask_admin.model import BaseModelView
+from flask_admin.model.fields import InlineFormField, InlineFieldList
 
 app = Flask(__name__)
-# database connect
-client = pymongo.MongoClient(port=27017)
-db= client.home_surveillance #database new
+KEY= os.urandom(24)
+app.config['SECRET_KEY'] = KEY
+client = MongoClient(port=27017)
+db = client.home_surveillance
 records = db.records
+bcrypt = Bcrypt(app)
+
+
+class UserForm(form.Form):
+    user = fields.StringField('Name')
+    email = fields.StringField('Email')
+    password = fields.PasswordField('Password',validators=[validators.DataRequired()],filters=[lambda x: bcrypt.generate_password_hash(x).decode('utf-8')])
+    relation = fields.StringField('Relation')
 
 
 @app.route("/", methods=['post', 'get'])
@@ -28,17 +46,21 @@ def index():
 @app.route("/register", methods=['post', 'get'])
 def reg():
     message = ''
+    myform = UserForm
     if "email" in session:
         return redirect(url_for("base"))
+
     if request.method == "POST":
         user = request.form.get("fullname")
         email = request.form.get("email")
-        
+        relation = request.form.get("relation")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
-        
-        user_found = records.find_one({"name": user})
+
+        user_found = records.find_one({"user": user})
         email_found = records.find_one({"email": email})
+        relation_found = records.find_one({"relation": relation})
+
         if user_found:
             message = 'There already is a user by that name'
             return render_template('register.html', message=message)
@@ -50,12 +72,20 @@ def reg():
             return render_template('register.html', message=message)
         else:
             hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
-            user_input = {'name': user, 'email': email, 'password': hashed}
+            user_input = {'user': user,'relation':relation,'email': email, 'password': hashed}
             records.insert_one(user_input)
-            
+
             user_data = records.find_one({"email": email})
             new_email = user_data['email']
-   
+
+            # myform.user.data = user_input['user']
+            # myform.relation.data = user_input['relation']
+            # myform.email.data = user_input['email']
+            # myform.password.data = user_input['password']
+
+
+
+
             return render_template('base.html', email=new_email)
     return render_template('register.html')
 
@@ -70,12 +100,12 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-       
+
         email_found = records.find_one({"email": email})
         if email_found:
             email_val = email_found['email']
             passwordcheck = email_found['password']
-            
+
             if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
                 session["email"] = email_val
                 return redirect(url_for('base'))
@@ -106,13 +136,27 @@ def newent():
 
 
 @app.route('/csv', methods=['GET', 'POST'])
-def csvfile(): 
+def csvfile():
     if "email" in session:
         email = session["email"]
         return render_template('csv.html', email=email)
-    
+
+class UserView(ModelView):
+    column_list = ('user', 'email', 'relation','password')
+    column_sortable_list = ('user', 'email','relation','password')
+    #column_exclude_list = ['password']
+
+    form = UserForm
+
+# Flask views
+@app.route('/admin')
+def adminPanel():
+    return '<a href="/admin/">Click me to get to Admin!</a>'
 
 
 if __name__ == '__main__':
-    app.secret_key = 'mysecret'
-    app.run(debug=True)
+    admin = admin.Admin(app, name='Home_Surveillance')
+    admin.add_view(UserView(records, 'User'))
+
+    # Start app
+    app.run(host='0.0.0.0',port='8000',debug=True)
