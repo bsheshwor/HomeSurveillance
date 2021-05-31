@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 import pymongo
+import bcrypt
 from flask_bcrypt import Bcrypt
 
 from pymongo import MongoClient
@@ -27,7 +28,6 @@ class UserForm(form.Form):
     email = fields.StringField('Email')
     password = fields.PasswordField('Password',validators=[validators.DataRequired()],filters=[lambda x: bcrypt.generate_password_hash(x).decode('utf-8')])
     relation = fields.StringField('Relation')
-
 
 @app.route("/", methods=['post', 'get'])
 def base():
@@ -71,19 +71,12 @@ def reg():
             message = 'Passwords should match!'
             return render_template('register.html', message=message)
         else:
-            hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
+            hashed = bcrypt.generate_password_hash(password2).decode('utf-8')
             user_input = {'user': user,'relation':relation,'email': email, 'password': hashed}
             records.insert_one(user_input)
 
             user_data = records.find_one({"email": email})
             new_email = user_data['email']
-
-            # myform.user.data = user_input['user']
-            # myform.relation.data = user_input['relation']
-            # myform.email.data = user_input['email']
-            # myform.password.data = user_input['password']
-
-
 
 
             return render_template('base.html', email=new_email)
@@ -99,14 +92,14 @@ def login():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-
-
+        #pass_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        #print(pass_hash)
         email_found = records.find_one({"email": email})
         if email_found:
             email_val = email_found['email']
             passwordcheck = email_found['password']
-
-            if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
+            print(passwordcheck)
+            if bcrypt.check_password_hash(passwordcheck,password):
                 session["email"] = email_val
                 return redirect(url_for('base'))
             else:
@@ -159,4 +152,4 @@ if __name__ == '__main__':
     admin.add_view(UserView(records, 'User'))
 
     # Start app
-    app.run(host='0.0.0.0',port='8000',debug=True)
+    app.run(host='0.0.0.0',port='3030',debug=True)
