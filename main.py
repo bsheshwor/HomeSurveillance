@@ -1,50 +1,48 @@
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response, request, redirect, session, url_for
 from camera import recordData,VideoCamera
 import cv2
 from pymongo import MongoClient
 from datetime import datetime
-import numpy as np
+# import numpy as np
 import face_recognition
 import os
-
-import pymongo
-from bson.objectid import ObjectId
+import bcrypt
+from flask_bcrypt import Bcrypt
+import pandas as pd
+# from bson.objectid import ObjectId
 import flask_admin as admin
-from wtforms import form, fields
-from flask_admin.form import Select2Widget
+from wtforms import form, fields, validators
+# from flask_admin.form import Select2Widget
 from flask_admin.contrib.pymongo import ModelView, filters
-from flask_admin.model.fields import InlineFormField, InlineFieldList
-
+# from flask_admin.model import BaseModelView
+# from flask_admin.model.fields import InlineFormField, InlineFieldList
 
 
 
 app = Flask(__name__)
-KEY= os.urandom(24)
-app.config['SECRET_KEY'] = KEY
+KEY = os.urandom(24)
+app.config["SECRET_KEY"] = KEY
 client = MongoClient(port=27017)
-db = client.home_surveillance
+db = client.home_surveillance  # database new
+records = db.records
+bcrypt = Bcrypt(app)
 
-
-# User admin
-class InnerForm(form.Form):
-    relation = fields.StringField('Relation')
-
-
+# forms
 class UserForm(form.Form):
-    name = fields.StringField('Name')
-    email = fields.StringField('Email')
-    password = fields.StringField('Password')
-
-    # Inner form
-    inner = InlineFormField(InnerForm)
-
-    # Form list
-    form_list = InlineFieldList(InlineFormField(InnerForm))
-
+    user = fields.StringField("Name")
+    email = fields.StringField("Email")
+    password = fields.PasswordField(
+        "Password",
+        validators=[validators.DataRequired()],
+        filters=[lambda x: bcrypt.generate_password_hash(x).decode("utf-8")],
+    )
+    relation = fields.StringField("Relation")
 
 
 
 def insertDataToDb(name,relation,encodings):
+    client = MongoClient(port=27017)
+    db = client.home_surveillance  # database new
 
     data = {
         'name': name,
@@ -61,9 +59,9 @@ def gen(camera):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
 
 
 @app.route('/video')
@@ -115,31 +113,144 @@ def takeimage():
     os.remove('t.jpeg')
 
     return Response(status=200)
-# else:
-    #     return  Response(status=400)
-    # print('Runiing sdklasdjasl;djas')
+
+@app.route("/", methods=["post", "get"])
+def base():
+    if "email" in session:
+        email = session["email"]
+        relation = session["relation"]
+
+        return render_template("base.html", email=email, relation=relation)
+    else:
+        return redirect(url_for("login"))
 
 
+@app.route("/index", methods=["post", "get"])
+def index():
+    if "email" in session:
+        email = session["email"]
+        relation = session["relation"]
 
-class UserView(ModelView):
-    column_list = ('name', 'email', 'password')
-    column_sortable_list = ('name', 'email', 'password')
+        return render_template("index.html", email=email, relation= relation)
 
-    form = UserForm
 
+@app.route("/register", methods=["post", "get"])
+def reg():
+    message = ""
+    myform = UserForm
+    if "email" in session:
+        return redirect(url_for("base"))
+
+    if request.method == "POST":
+        user = request.form.get("fullname")
+        email = request.form.get("email")
+        relation = "member"
+        password1 = request.form.get("password1")
+        password2 = request.form.get("password2")
+
+        user_found = records.find_one({"user": user})
+        email_found = records.find_one({"email": email})
+        relation_found = records.find_one({"relation": relation})
+
+        if user_found:
+            message = "There already is a user by that name"
+            return render_template("register.html", message=message)
+        if email_found:
+            message = "This email already exists in database"
+            return render_template("register.html", message=message)
+        if password1 != password2:
+            message = "Passwords should match!"
+            return render_template("register.html", message=message)
+        else:
+            hashed = bcrypt.generate_password_hash(password2).decode("utf-8")
+            user_input = {
+                "user": user,
+                "relation": relation,
+                "email": email,
+                "password": hashed,
+            }
+            records.insert_one(user_input)
+
+            user_data = records.find_one({"email": email})
+            new_email = user_data["email"]
+
+            return render_template("base.html", email=new_email)
+    return render_template("register.html")
+
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    message = ""
+    if "email" in session:
+        return redirect(url_for("base"))
+
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        # pass_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        # print(pass_hash)
+        email_found = records.find_one({"email": email})
+        if email_found:
+            email_val = email_found["email"]
+            passwordcheck = email_found["password"]
+            relation = email_found["relation"]
+
+            if bcrypt.check_password_hash(passwordcheck, password):
+                session["email"] = email_val
+                session["relation"] = relation
+                return redirect(url_for("index"))
+            else:
+                if "email" in session:
+                    return redirect(url_for("index.html"))
+                message = "Wrong password"
+                return render_template("login.html", message=message)
+        else:
+            message = "Email not found"
+            return render_template("login.html", message=message)
+    return render_template("login.html")
+
+
+@app.route("/signout", methods=["POST", "GET"])
+def logout():
+    if "email" in session:
+        session.pop("email", None)
+        return render_template("base.html")
+    else:
+        return render_template("register.html")
+
+
+@app.route("/newentry", methods=["post", "get"])
+def newent():
+    if "email" in session:
+        email = session["email"]
+        realtion = session["relation"]
+        return render_template("newentry.html", email=email, relation = realtion)
+
+@app.route('/csv', methods=['GET', 'POST'])
+def csvfile():
+    if "email" in session:
+        email = session["email"]
+        relation = session["relation"]
+        dict_from_csv = pd.read_csv('static/data.csv', header=None, index_col=0, squeeze=True).to_dict()
+        #df = pd.read_csv('static/data.csv')
+        #db.csvdata.insert_one(dict_from_csv)
+        return render_template('csv.html', email=email,relation=relation, data=dict_from_csv)
 # Flask views
-@app.route('/admin')
+@app.route("/admin")
 def adminPanel():
     return '<a href="/admin/">Click me to get to Admin!</a>'
 
+class UserView(ModelView):
+    column_list = ("user", "email", "relation", "password")
+    column_sortable_list = ("user", "email", "relation", "password")
+    # column_exclude_list = ['password']
+
+    form = UserForm
+
+
 
 if __name__ == '__main__':
-    # Create admin
-    admin = admin.Admin(app, name='Home_Surveillance')
+    admin = admin.Admin(app, name="Home_Surveillance")
+    admin.add_view(UserView(records, "User"))
 
-    # Add views
-    admin.add_view(UserView(db.user, 'User'))
-    #admin.add_view(TweetView(db.tweet, 'Tweets'))
-
-    # Start app
-    app.run(host='0.0.0.0',port='8000',debug=True)
+    app.run(host='0.0.0.0', debug=True)
