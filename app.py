@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 import pymongo
 import bcrypt
+import pandas as pd
 from flask_bcrypt import Bcrypt
 
 from pymongo import MongoClient
@@ -15,8 +16,8 @@ from flask_admin.model import BaseModelView
 from flask_admin.model.fields import InlineFormField, InlineFieldList
 
 app = Flask(__name__)
-KEY= os.urandom(24)
-app.config['SECRET_KEY'] = KEY
+KEY = os.urandom(24)
+app.config["SECRET_KEY"] = KEY
 client = MongoClient(port=27017)
 db = client.home_surveillance
 records = db.records
@@ -24,31 +25,38 @@ bcrypt = Bcrypt(app)
 
 
 class UserForm(form.Form):
-    user = fields.StringField('Name')
-    email = fields.StringField('Email')
-    password = fields.PasswordField('Password',validators=[validators.DataRequired()],filters=[lambda x: bcrypt.generate_password_hash(x).decode('utf-8')])
-    relation = fields.StringField('Relation')
+    user = fields.StringField("Name")
+    email = fields.StringField("Email")
+    password = fields.PasswordField(
+        "Password",
+        validators=[validators.DataRequired()],
+        filters=[lambda x: bcrypt.generate_password_hash(x).decode("utf-8")],
+    )
+    relation = fields.StringField("Relation")
 
-@app.route("/", methods=['post', 'get'])
+
+@app.route("/", methods=["post", "get"])
 def base():
     if "email" in session:
         email = session["email"]
         relation = session["relation"]
 
-        return render_template('base.html', email=email, relation=relation)
+        return render_template("base.html", email=email, relation=relation)
     else:
         return redirect(url_for("login"))
 
-@app.route("/index", methods=['post', 'get'])
+
+@app.route("/index", methods=["post", "get"])
 def index():
     if "email" in session:
         email = session["email"]
 
-        return render_template('index.html', email=email)
+        return render_template("index.html", email=email)
 
-@app.route("/register", methods=['post', 'get'])
+
+@app.route("/register", methods=["post", "get"])
 def reg():
-    message = ''
+    message = ""
     myform = UserForm
     if "email" in session:
         return redirect(url_for("base"))
@@ -65,57 +73,62 @@ def reg():
         relation_found = records.find_one({"relation": relation})
 
         if user_found:
-            message = 'There already is a user by that name'
-            return render_template('register.html', message=message)
+            message = "There already is a user by that name"
+            return render_template("register.html", message=message)
         if email_found:
-            message = 'This email already exists in database'
-            return render_template('register.html', message=message)
+            message = "This email already exists in database"
+            return render_template("register.html", message=message)
         if password1 != password2:
-            message = 'Passwords should match!'
-            return render_template('register.html', message=message)
+            message = "Passwords should match!"
+            return render_template("register.html", message=message)
         else:
-            hashed = bcrypt.generate_password_hash(password2).decode('utf-8')
-            user_input = {'user': user,'relation':relation,'email': email, 'password': hashed}
+            hashed = bcrypt.generate_password_hash(password2).decode("utf-8")
+            user_input = {
+                "user": user,
+                "relation": relation,
+                "email": email,
+                "password": hashed,
+            }
             records.insert_one(user_input)
 
             user_data = records.find_one({"email": email})
-            new_email = user_data['email']
+            new_email = user_data["email"]
 
-
-            return render_template('base.html', email=new_email)
-    return render_template('register.html')
+            return render_template("base.html", email=new_email)
+    return render_template("register.html")
 
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    message = ''
+    message = ""
     if "email" in session:
         return redirect(url_for("base"))
 
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-        #pass_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-        #print(pass_hash)
+        # pass_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        # print(pass_hash)
         email_found = records.find_one({"email": email})
         if email_found:
-            email_val = email_found['email']
-            passwordcheck = email_found['password']
-            relation = email_found['relation']
+            email_val = email_found["email"]
+            passwordcheck = email_found["password"]
+            relation = email_found["relation"]
 
-            if bcrypt.check_password_hash(passwordcheck,password):
+            if bcrypt.check_password_hash(passwordcheck, password):
                 session["email"] = email_val
                 session["relation"] = relation
-                return redirect(url_for('base'))
+                return redirect(url_for("base"))
             else:
                 if "email" in session:
                     return redirect(url_for("base.html"))
-                message = 'Wrong password'
-                return render_template('login.html', message=message)
+                message = "Wrong password"
+                return render_template("login.html", message=message)
         else:
-            message = 'Email not found'
-            return render_template('login.html', message=message)
-    return render_template('login.html')
+            message = "Email not found"
+            return render_template("login.html", message=message)
+    return render_template("login.html")
+
 
 @app.route("/signout", methods=["POST", "GET"])
 def logout():
@@ -123,38 +136,42 @@ def logout():
         session.pop("email", None)
         return render_template("base.html")
     else:
-        return render_template('register.html')
+        return render_template("register.html")
 
 
-@app.route("/newentry", methods=['post', 'get'])
+@app.route("/newentry", methods=["post", "get"])
 def newent():
     if "email" in session:
         email = session["email"]
-        return render_template('newentry.html', email=email)
-
+        return render_template("newentry.html", email=email)
 
 @app.route('/csv', methods=['GET', 'POST'])
 def csvfile():
     if "email" in session:
         email = session["email"]
-        return render_template('csv.html', email=email)
+        relation = session["relation"]
+        dict_from_csv = pd.read_csv('static/data.csv', header=None, index_col=0, squeeze=True).to_dict()
+        #df = pd.read_csv('static/data.csv')
+        #db.csvdata.insert_one(dict_from_csv)
+        return render_template('csv.html', email=email,relation=relation, data=dict_from_csv)
 
 class UserView(ModelView):
-    column_list = ('user', 'email', 'relation','password')
-    column_sortable_list = ('user', 'email','relation','password')
-    #column_exclude_list = ['password']
+    column_list = ("user", "email", "relation", "password")
+    column_sortable_list = ("user", "email", "relation", "password")
+    # column_exclude_list = ['password']
 
     form = UserForm
 
+
 # Flask views
-@app.route('/admin')
+@app.route("/admin")
 def adminPanel():
     return '<a href="/admin/">Click me to get to Admin!</a>'
 
 
-if __name__ == '__main__':
-    admin = admin.Admin(app, name='Home_Surveillance')
-    admin.add_view(UserView(records, 'User'))
+if __name__ == "__main__":
+    admin = admin.Admin(app, name="Home_Surveillance")
+    admin.add_view(UserView(records, "User"))
 
     # Start app
-    app.run(host='0.0.0.0',port='1300',debug=True)
+    app.run(host="0.0.0.0", port="3000", debug=True)
