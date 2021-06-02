@@ -2,13 +2,34 @@
   <head>
 
     <title>Record New Face</title>
+    <link rel="stylesheet" href="static/css/master.css">
+
   </head>
   <body>
-    <h1>Page for recording new face data</h1>
+
+    <div class="container">
+    <div class="title">New Data Register</div>
     <img src="{{ url_for('recordrecord') }}">
-     <input id="input" type="text" name="fname"><br>
-     <input id="relation" type="text" name="fname"><br>
-     <button onclick="myFunction()" type="button">Submit</button>
+    <div class="content">
+      <form action="#" method="POST">
+        <div class="user-details">
+
+          <div class="input-box">
+            <span class="details">Enter Your Name</span>
+            <input type="text" id="input"   name="name" placeholder="Enter your name" required>
+          </div>
+
+          <div class="input-box">
+            <span class="details">Relation With The Owner</span>
+            <input type="text" id="relation" name="text" placeholder="Enter your relation" required>
+          </div>
+        </div>
+            <button onclick="myFunction()" type="button">Submit</button>
+
+      </form>
+    </div>
+  </div>
+
      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
      <script>
 function myFunction() {
