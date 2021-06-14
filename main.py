@@ -241,39 +241,6 @@ def csvfile():
 
 
 # Flask views
-#@app.route("/admin")
-#def adminLogin():
-#    message = ""
-#
-#    #return '<a href="/admin/">Click me to get to Admin!</a>'
-#    if request.method == "POST":
-#        email = request.form.get("email")
-#        password = request.form.get("password")
-#        # pass_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-#        # print(pass_hash)
-#        email_found = records.find_one({"email": email})
-#        #relation_found = records.find_one({"relation": relation})
-#        
-#        if email_found:
-#            email_val = email_found["email"]
-#            passwordcheck = email_found["password"]
-#            relation = email_found["relation"]
-#
-#            
-#            if bcrypt.check_password_hash(passwordcheck, password):
-#                if relation == 'admin':
-#                    session["email"] = email_val
-#                    session["relation"] = relation
-#                    return redirect(url_for("adminPanel"))
-#            else:
-#                message = "Wrong password Or Non-admin"
-#                return render_template("admin_login.html", message=message)
-#        else:
-#            message = "Email not found"
-#            return render_template("admin_login.html", message=message)
-#    return render_template("admin_login.html")
-
-
 @app.route('/admin')
 def adminPanel():
     return '<a href="/admin/">Click me to get to Admin!</a>'
