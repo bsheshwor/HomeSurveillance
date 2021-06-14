@@ -210,6 +210,9 @@ def login():
     return render_template("login.html")
 
 
+   
+
+
 @app.route("/signout", methods=["POST", "GET"])
 def logout():
     if "email" in session:
@@ -235,17 +238,60 @@ def csvfile():
         #df = pd.read_csv('static/data.csv')
         #db.csvdata.insert_one(dict_from_csv)
         return render_template('csv.html', email=email,relation=relation, data=dict_from_csv)
+
+
 # Flask views
-@app.route("/admin")
+#@app.route("/admin")
+#def adminLogin():
+#    message = ""
+#
+#    #return '<a href="/admin/">Click me to get to Admin!</a>'
+#    if request.method == "POST":
+#        email = request.form.get("email")
+#        password = request.form.get("password")
+#        # pass_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+#        # print(pass_hash)
+#        email_found = records.find_one({"email": email})
+#        #relation_found = records.find_one({"relation": relation})
+#        
+#        if email_found:
+#            email_val = email_found["email"]
+#            passwordcheck = email_found["password"]
+#            relation = email_found["relation"]
+#
+#            
+#            if bcrypt.check_password_hash(passwordcheck, password):
+#                if relation == 'admin':
+#                    session["email"] = email_val
+#                    session["relation"] = relation
+#                    return redirect(url_for("adminPanel"))
+#            else:
+#                message = "Wrong password Or Non-admin"
+#                return render_template("admin_login.html", message=message)
+#        else:
+#            message = "Email not found"
+#            return render_template("admin_login.html", message=message)
+#    return render_template("admin_login.html")
+
+
+@app.route('/admin')
 def adminPanel():
     return '<a href="/admin/">Click me to get to Admin!</a>'
+
 
 class UserView(ModelView):
     column_list = ("user", "email", "relation", "password")
     column_sortable_list = ("user", "email", "relation", "password")
     # column_exclude_list = ['password']
+    
+    def is_accessible(self):
+        if "email" in session:
+            relation = session["relation"]
+            return relation == 'admin'
 
     form = UserForm
+
+   
 
 
 
