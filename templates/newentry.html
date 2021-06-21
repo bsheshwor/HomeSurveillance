@@ -1,5 +1,5 @@
 {% extends 'base.html'%}
-{% block title %}Home Surveillance {% endblock %}
+{% block title %}Add Record-HomeSurveillance {% endblock %}
 
 {% block content %}
      
@@ -23,6 +23,15 @@
             <span class="details">Relation With The Owner</span>
             <input type="text" id="relation" name="text" placeholder="Enter your relation" required>
           </div>
+
+          <div class="input-box">
+            <span class="details">Phone:</span>
+            <input type="text" id="contact" name="number" placeholder="Enter your contact number" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Address</span>
+            <input type="text" id="address" name="text" placeholder="Enter address" required>
+          </div>
         </div>
         <button onclick="myFunction()" type="button">Submit</button>
 
@@ -34,11 +43,15 @@
 function myFunction() {
   var name = document.getElementById("input").value;
   var relation = document.getElementById("relation").value;
+  var address = document.getElementById("address").value;
+  var phone = document.getElementById("contact").value;
   console.log(name);
   $.post("/takeimage",
    {
      name: name,
-     relation: relation
+     relation: relation,
+     address: address,
+     phone: phone
    },
    function(data, status){
      alert("Data: " + data + "\nStatus: " + status);

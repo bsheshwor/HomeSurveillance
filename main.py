@@ -3,19 +3,15 @@ from camera import recordData,VideoCamera
 import cv2
 from pymongo import MongoClient
 from datetime import datetime
-# import numpy as np
 import face_recognition
 import os
 import bcrypt
 from flask_bcrypt import Bcrypt
 import pandas as pd
-# from bson.objectid import ObjectId
 import flask_admin as admin
 from wtforms import form, fields, validators
-# from flask_admin.form import Select2Widget
 from flask_admin.contrib.pymongo import ModelView, filters
-# from flask_admin.model import BaseModelView
-# from flask_admin.model.fields import InlineFormField, InlineFieldList
+from latestclass import Images
 
 
 
@@ -40,18 +36,6 @@ class UserForm(form.Form):
 
 
 
-def insertDataToDb(name,relation,encodings):
-    client = MongoClient(port=27017)
-    db = client.home_surveillance  # database new
-
-    data = {
-        'name': name,
-        'relation': relation,
-        'encodings': encodings
-
-    }
-    appData = db.appData
-    appData.insert_one(data)
 
 def gen(camera):
     while True:
@@ -81,18 +65,18 @@ def recordrecord():
 
 @app.route('/takeimage', methods = ['POST'])
 def takeimage():
-    # num = recordData().no_of_faces
-    # if num ==1:
-    #     print('Running hEre')
     name = request.form['name']
     relation = request.form['relation']
+    address = request.form['address']
+    phone = request.form['phone']
     print(type(name))
     imgToSave = cv2.imread('t.jpeg')
     now = datetime.now()
     dtstring = now.strftime('%y%m%d%H%M%S')
-
+    # clearing directory
+    
     img_name = "{}_{}.png".format(name, dtstring)
-    path = 'source'
+    path = 'source/'
     cv2.imwrite(os.path.join(path, img_name), imgToSave)
     print("{} written!".format(img_name))
 
@@ -108,9 +92,15 @@ def takeimage():
 
     for i in range(len(faceEncoding)):
         encodingList.append(faceEncoding[i])
+    
+    new = Images()
 
-    insertDataToDb(name=name, relation=relation, encodings=encodingList)
+    new.insertDataToDb(name=name,path=path,tempfile= img_name,relation=relation,address=address,phone=phone,filename="t.jpeg", encodings=encodingList)
+    dir = 'source'
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
     os.remove('t.jpeg')
+
 
     return Response(status=200)
 
@@ -235,6 +225,26 @@ def csvfile():
         #df = pd.read_csv('static/data.csv')
         #db.csvdata.insert_one(dict_from_csv)
         return render_template('csv.html', email=email,relation=relation, data=dict_from_csv)
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if "email" in session:
+        email = session["email"]
+        relation = session["relation"]
+        if request.method == "POST":
+            query = request.form.get("search")
+            img = Images()
+            details=img.queryData(query)
+            print(query)
+            file = "images/"+query+".jpeg"
+            print(file)
+            if details:
+                return render_template('search.html',file= file, email=email, relation = relation, details = details)
+    return render_template('search.html',email=email, relation = relation)
+
+
+
 # Flask views
 @app.route("/admin")
 def adminPanel():

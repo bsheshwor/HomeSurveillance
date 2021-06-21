@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Surveillance</title>
+   <title> {% block title %} {% endblock %}</title>
+       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <link rel="stylesheet" href="static/css/base.css">
+
 </head>
 <body>
+ 
 
     <header>
         <div class="logo">Video Streaming</div>
@@ -26,11 +31,19 @@
                 <li><a href="register">Register</a></li>
                 <li><a href="login">Login</a></li>
                 {% endif %}
+                {% if email%}
+                    <form action="{{ url_for("search")}}" method="POST">
+                    <input type="text" placeholder="Search.." name="search">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                    </form>
+                    {% endif %}
             </ul>
         </div>
+        {% if email%}
         <h4 style="color: azure;">Current User:{{email}}</h4>
-
+        {% endif %}
     </header>
+    <br><br>
     <section class="Form_container">
        {% block content %}
 

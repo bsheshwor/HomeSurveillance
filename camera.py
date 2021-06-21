@@ -79,7 +79,8 @@ class VideoCamera(object):
     def __init__(self):
         # self.video = cv2.VideoCapture(1)
         # self.address = "http://192.168.43.1:8080/video"
-        self.address = "http://192.168.0.100:8080/video"
+        # self.address = "http://192.168.0.100:8080/video"
+        self.address = "http://192.168.1.7:8080/video"
         self.video = cv2.VideoCapture(self.address)
         # self.vide.set(3, 640)
         # self.vide.set(4, 480)
