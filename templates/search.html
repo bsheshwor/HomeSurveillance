@@ -1,0 +1,32 @@
+{% extends "base.html"%}
+
+{% block title%}
+FInd Image-HomeSurveillance
+{% endblock %}
+
+{% block content %}
+{% if file %}
+
+
+<div class="card" style="width: 35rem;">
+ 
+
+<image src="{{url_for('static',filename = file )}}"  class="card-img-top" >
+ <div class="card-body">
+     <h5 class="card-title">Person Details:</h5>
+      <p class="card-text">{% for key, value in details.items() %}</p>
+
+    
+        {{ key }} : {{ value }}
+            {% endfor %}
+
+   <p> <a href="/static/images/image.jpeg" download class="btn btn-primary">Download Image</a>
+    </p>  
+  </div>
+
+ {% else %}
+<h1>Image Not Found</h1>
+{% endif %} 
+
+{% endblock %}
+   
