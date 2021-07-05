@@ -2,7 +2,7 @@
 
 **It is a web app which has the feature of vision based security. If intruders enter the house, the app will recognize the face and send a negative message to the admin. Similarly, if the house members enter the house, it will send a positive message to the admin. This app is built by implementing Computer Vision and face recognition model.**
 
-## The libraries used in this project are listed below:
+#### The libraries used in this project are listed below:
 
 - openCV
 
