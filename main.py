@@ -163,7 +163,6 @@ def reg():
 
             user_data = records.find_one({"email": email})
             new_email = user_data["email"]
-
             return render_template("base.html", email=new_email)
     return render_template("register.html")
 
@@ -188,10 +187,10 @@ def login():
             if bcrypt.check_password_hash(passwordcheck, password):
                 session["email"] = email_val
                 session["relation"] = relation
-                return redirect(url_for("index"))
+                return redirect(url_for("base"))
             else:
                 if "email" in session:
-                    return redirect(url_for("index.html"))
+                    return redirect(url_for("base.html"))
                 message = "Wrong password"
                 return render_template("login.html", message=message)
         else:
