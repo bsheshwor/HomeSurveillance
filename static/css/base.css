@@ -6,9 +6,10 @@
 header{
     display: flex;
     justify-content: space-around;
-    background-color: #409FDD;
-   height: 10vh;
-   align-items: center;
+    background-color: whitesmoke;
+    height: 10vh;
+    align-items: center;
+    width: 100%;
 
 }
 .logo{
@@ -18,10 +19,17 @@ header{
     font-weight:bold;
     color: white;
 }
+.custom__form-control{
+    width: auto; 
+    margin: 0 1rem;
+}
 .navlinks ul{
    display: flex;
-
+   height: 100%;
+   margin: 0;
+   align-items: center;
 }
+
 .navlinks li{
     margin: 25px;
     font-size: 20px;
@@ -31,12 +39,19 @@ header{
     text-decoration: none;
     color: white;
 }
-
-a:hover{
-    background: #258CD0;
-    padding: 6px;
-    border-radius: 15px;
+.custom-styling__navLinks{
+    flex: 1 !important;
 }
+
+header .logo:hover{
+    background: #979da1;
+    
+}
+a:hover{
+    background: #979da1;
+    
+}
+
 
 .burger div{
     width: 29px;
@@ -55,7 +70,7 @@ img{
     max-height: 100%;
 }
 
-@media (max-width:1000px)
+@media (max-width:900px)
 {
     .logo{
         font-size: 30px;
@@ -97,7 +112,7 @@ img{
             cursor: pointer;
         }
         .burger:hover{
-            background-color: #258CD0;
+            background-color: #c0d1db;
             border-radius: 10px;
         }
 }

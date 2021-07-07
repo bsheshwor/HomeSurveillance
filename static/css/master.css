@@ -5,6 +5,7 @@ body {
 .container {
 	position: relative;
 	margin-top: 100px;
+  margin-bottom: 100px;
 }
 .container img {
 	display: block;

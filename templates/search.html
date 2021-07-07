@@ -1,14 +1,13 @@
 {% extends "base.html"%}
 
 {% block title%}
-FInd Image-HomeSurveillance
+Find Image-HomeSurveillance
 {% endblock %}
 
 {% block content %}
 {% if file %}
 
-
-<div class="card" style="width: 35rem;">
+<div class="card" style="width: 25rem;">
  
 
 <image src="{{url_for('static',filename = file )}}"  class="card-img-top" >

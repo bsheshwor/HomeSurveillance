@@ -5,27 +5,21 @@ import os
 from datetime import datetime
 import pandas as pd
 import numpy as np
+import smtplib
+from email.message import EmailMessage
+import time
+import imghdr
 from pymongo import MongoClient
+from playsound import playsound
+
 
 face_cascade = cv2.CascadeClassifier('models/haarcascade_frontalface_default.xml')
 # ds_factor = 0.6
 client = MongoClient(port=27017)
 db= client.home_surveillance #database new
 appData= db.appData
+imageRel= db.imageRel
 
-
-faceData=[]
-for x in appData.find({},{ "_id": 0 }):
-  faceData.append(x)
-face = []
-# print((faceData[0]['encodings']))
-
-
-for i in range(len(faceData)):
-    face_arr = np.zeros(128)
-    for j in range(128):
-        face_arr[j]=faceData[i]['encodings'][j]
-    face.append(face_arr)
 
 
 print('Data Extraction Complete')
@@ -34,8 +28,10 @@ print('Data Extraction Complete')
 class recordData(object):
     def __init__(self):
         # self.address ="http://192.168.0.100:8080/video"
-        # self.video = cv2.VideoCapture(self.address)
+        #self.address = "http://10.42.0.144:8080/video"
+
         self.video = cv2.VideoCapture(0)
+        # self.video = cv2.VideoCapture()
         self.no_of_faces = 0
 
     def __del__(self):
@@ -79,9 +75,29 @@ class VideoCamera(object):
     def __init__(self):
         # self.video = cv2.VideoCapture(1)
         # self.address = "http://192.168.43.1:8080/video"
-        # self.address = "http://192.168.0.100:8080/video"
-        self.address = "http://192.168.1.7:8080/video"
+        self.address = "http://192.168.100.175:8080/video"
         self.video = cv2.VideoCapture(self.address)
+
+        self.faceData = []
+        for x in imageRel.find({}, {"_id": 0}):
+            self.faceData.append(x)
+
+        # print(faceData)
+        self.face = []
+        self.namelist = []
+        for i in range(len(self.faceData)):
+            self.namelist.append(self.faceData[i]['name'])
+
+        # print((faceData[0]['encodings']))
+
+        print(self.namelist)
+
+        for i in range(len(self.faceData)):
+            face_arr = np.zeros(128)
+            for j in range(128):
+                face_arr[j] = self.faceData[i]['encodings'][j]
+            self.face.append(face_arr)
+
         # self.vide.set(3, 640)
         # self.vide.set(4, 480)
 
@@ -97,14 +113,14 @@ class VideoCamera(object):
         encodesCurFrame = face_recognition.face_encodings(imgS, facesCurFrame)
 
         for encodeFace, faceLoc in zip(encodesCurFrame, facesCurFrame):
-            matches = face_recognition.compare_faces(face, encodeFace)
-            faceDist = face_recognition.face_distance(face, encodeFace)
+            matches = face_recognition.compare_faces(self.face, encodeFace)
+            faceDist = face_recognition.face_distance(self.face, encodeFace)
             # print(matches)
             matchIndex = np.argmin(faceDist)
 
             if matches[matchIndex]:
-                name = faceData[matchIndex]['name'].upper()
-                relation = faceData[matchIndex]['relation'].upper()
+                name = self.faceData[matchIndex]['name'].upper()
+                relation = self.faceData[matchIndex]['relation'].upper()
                 # print(name)
                 y1, x2, y2, x1 = faceLoc
                 y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
@@ -112,23 +128,79 @@ class VideoCamera(object):
                 cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
                 cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
                 cv2.putText(img, relation, (x1 + 50, y2 + 50), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-                # memberentry_record(name)
+                self.memberentry_record(name)
             else:
-                name = 'Unknown'
+                name = 'unknown'
                 # print(name)
                 y1, x2, y2, x1 = faceLoc
                 y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
                 cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-                # memberentry_record(name)
+                self.memberentry_record(name)
+                t = time.strftime("%Y-%m-%d_%H-%M-%S")
                 print("Unknown member detected, Alert!!")
+                cv2.imwrite('intruder.jpg', img)
 
-        # cv2.imshow('webcam', img)
         cv2.waitKey(1)
-
-
-
-
         ret, jpeg = cv2.imencode('.jpg', img)
         return jpeg.tobytes()
+
+
+    def memberentry_record(self, name):
+        name = name.lower()
+        with open('static/data.csv', 'r+') as f:
+            myDataList = f.readlines()
+            entryList=[]
+            for line in myDataList:
+                entry = line.split(',')
+                entryList.append(entry[0])
+
+
+            if name in self.namelist:
+                if name not in entryList:
+                    t = time.strftime("%Y-%m-%d_%H-%M-%S")
+                    f.writelines(f'\n{name},{t}')
+
+
+            elif name not in self.namelist:
+                t = time.strftime("%Y-%m-%d_%H-%M-%S")
+                f.writelines(f'\n{name},{t}')
+                print("unknown persion recorded")
+
+                self.email_alert("Security Alert!!","Someone just trespassed your property at " +t +"!!","shresthanaruto97@gmail.com")
+
+
+
+
+    def email_alert(self, subject, body, to):
+        msg = EmailMessage()
+        msg.set_content(body)
+        msg['subject'] = subject
+        msg['to'] = to
+
+        user = 'gaurabstha001@gmail.com'
+        msg['from'] = user
+        password = 'pgvrykietyiugmxf'
+
+        with open('intruder.jpg', 'rb') as f:
+            file_data = f.read()
+            file_type = imghdr.what(f.name)
+            file_name = f.name
+        
+        msg.add_attachment(file_data, maintype='image', subtype=file_type, filename=file_name)
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(user, password)
+        server.send_message(msg)
+
+        server.quit()
+
+        print("email success")
+
+
+       
+
+
+        

@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title> {% block title %} {% endblock %}</title>
-       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="static/css/base.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital@1&display=swap" rel="stylesheet">
 
 </head>
 <body>
@@ -15,33 +16,37 @@
 
     <header>
         <div class="logo">Video Streaming</div>
-        <div class="navlinks">
-            <ul>
 
+        <div class="navlinks custom-styling__navLinks" style="height: 100%;">
+            <ul style="height: 100%; align-items: center;">
+                {% if email %}
                 <li><a href="index">Home</a></li>
-                  {% if email %}
                 <li><a href="newentry">New Data</a></li>
                 <li><a href="csv">History</a></li>
                 {% if relation == "admin"%}
                 <li><a href="admin">Admin</a></li>
                 {%endif%}
-                <li><a href="signout">Logout</a></li>
 
                 {% else %}
                 <li><a href="register">Register</a></li>
                 <li><a href="login">Login</a></li>
                 {% endif %}
-                {% if email%}
-                    <form action="{{ url_for("search")}}" method="POST">
-                    <input type="text" placeholder="Search.." name="search">
-                    <button type="submit"><i class="fa fa-search"></i></button>
-                    </form>
-                    {% endif %}
+                {% if email %}
+                <li><a href="signout">Logout</a></li>
+                {%endif%}
             </ul>
         </div>
+        
+
         {% if email%}
-        <h4 style="color: azure;">Current User:{{email}}</h4>
+        <h6 style="color: azure; font-size: 18px;font-family:'Nunito'; font-style: italic; margin: 0px;">Hello, {{email}}</h6>
+        <form class="custom__form-control" action="{{ url_for('search')}}" method="POST">
+            <input type="text" style="width: 100px;" placeholder="Search.." name="search">
+            <button type="submit"><i class="fa fa-search" style="width: 30px;"></i></button>   
+        </form>
         {% endif %}
+        
+
     </header>
     <br><br>
     <section class="Form_container">
