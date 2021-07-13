@@ -137,10 +137,11 @@ class VideoCamera(object):
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
                 cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+                cv2.imwrite('intruder.jpg', img)
                 self.memberentry_record(name)
                 t = time.strftime("%Y-%m-%d_%H-%M-%S")
                 print("Unknown member detected, Alert!!")
-                cv2.imwrite('intruder.jpg', img)
+               
 
         cv2.waitKey(1)
         ret, jpeg = cv2.imencode('.jpg', img)
