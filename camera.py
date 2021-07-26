@@ -10,17 +10,23 @@ from email.message import EmailMessage
 import time
 import imghdr
 from pymongo import MongoClient
-from playsound import playsound
+import pygame
+pygame.mixer.init()
+
 
 
 face_cascade = cv2.CascadeClassifier('models/haarcascade_frontalface_default.xml')
-# ds_factor = 0.6
+
 client = MongoClient(port=27017)
+
 db= client.home_surveillance #database new
 appData= db.appData
 imageRel= db.imageRel
 
 
+def play():
+    pygame.mixer.music.load('static/ALert.wav')
+    pygame.mixer.music.play(loops= 3)
 
 print('Data Extraction Complete')
 # cap = cv2.VideoCapture(0)
@@ -76,7 +82,7 @@ class VideoCamera(object):
         # self.video = cv2.VideoCapture(1)
         # self.address = "http://192.168.43.1:8080/video"
         self.address = "http://192.168.100.175:8080/video"
-        self.video = cv2.VideoCapture(self.address)
+        self.video = cv2.VideoCapture(0)
 
         self.faceData = []
         for x in imageRel.find({}, {"_id": 0}):
@@ -138,9 +144,12 @@ class VideoCamera(object):
                 cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
                 cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
                 cv2.imwrite('intruder.jpg', img)
+                play()
+
                 self.memberentry_record(name)
                 t = time.strftime("%Y-%m-%d_%H-%M-%S")
                 print("Unknown member detected, Alert!!")
+
                
 
         cv2.waitKey(1)
@@ -169,7 +178,7 @@ class VideoCamera(object):
                 f.writelines(f'\n{name},{t}')
                 print("unknown persion recorded")
 
-                self.email_alert("Security Alert!!","Someone just trespassed your property at " +t +"!!","shresthanaruto97@gmail.com")
+                self.email_alert("Security Alert!!","Someone just trespassed your property at " +t +"!!","shresthaumesh2056@gmail.com")
 
 
 

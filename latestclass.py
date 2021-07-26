@@ -2,7 +2,6 @@ from pymongo import MongoClient
 import gridfs
 import os
 from bson.objectid import ObjectId
-from bson import regex
 
 client = MongoClient(port=27017)
 db = client.home_surveillance  # database new
@@ -50,7 +49,7 @@ class Images():
     def getImages2(self,myId,name):     
         self.clearDirectory('static/images')
         outputdata = self.fs.get(ObjectId(myId)).read()
-        location = '/home/umesh/Projects/Flask-Admin-Mongo-Example/static/images/'+ name +'.jpeg'
+        location = 'static/images/'+ name +'.jpeg'
         output = open(location,'wb')
         output.write(outputdata)
         output.close()
