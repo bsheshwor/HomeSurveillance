@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %} About Us {% endblock %}
+
+{% block content %}
+
+
+<div class="about-section">
+    <h1>About Us</h1>
+    <img src="static/images/minion.jpg"  style="height: 65%; width: 85%;">
+    <p>Undergratude of kathmandu university.</p>
+    <p>Intermediate in Machine learning, web development with skills in opencv, c++, python</p>
+  </div>
+  
+  <div class="row">
+    <div class="column">
+      <div class="card">
+        <div class="container">
+          <h2>Gaurab Shrestha</h2>
+          <p class="title">Hero</p>
+          <p>Aspiring to work for the service of technological development in coming days 😃 </p>
+          <p>gaurabstha001@gmail.com</p>
+          <p><button class="button">Contact</button></p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="column">
+      <div class="card">
+        <div class="container">
+          <h2>Umesh Shrestha</h2>
+          <p class="title">Cool Koder</p>
+          <p>Aspiring to work for the service of technological development in coming days 😃 </p>
+          <p>shresthaumesh2056@gmail.com</p>
+          <p><button class="button">Contact</button></p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="column">
+      <div class="card">
+        <div class="container">
+          <h2>Bisheshwor Neupane</h2>
+          <p class="title">Leader</p>
+          <p>Aspiring to work for the service of technological development in coming days 😃 </p>
+          <p>eroj.nyoupane2@gmail.com</p>
+          <p><button class="button">Contact</button></p>
+        </div>
+      </div>
+    </div>
+  </div> 
+
+<style>
+  body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  }
+
+  html {
+    box-sizing: border-box;
+  }
+
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+
+  .column {
+    float: left;
+    width: 33.3%;
+    margin-bottom: 16px;
+    padding: 0 10px;
+  }
+
+  .card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    margin: 8px;
+  }
+
+  .about-section {
+    padding: 50px 50px;
+    text-align: center;
+    background-color: #5b87e6;
+    color: white;
+    margin-right: 50px;
+    height: 100%;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .container h2{
+    text-align: center;
+    font-size: 20px;
+    color: rgb(77, 53, 185);
+  }
+
+  .title {
+    color: rgb(192, 174, 174);
+    text-align: center;
+  }
+
+  .button {
+    border: none;
+    outline: 0;
+    display: inline-block;
+    padding: 8px;
+    color: white;
+    background-color: rgb(106, 60, 235);
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .button:hover {
+    background-color: rgb(20, 10, 105);
+  }
+
+  @media screen and (max-width: 750px) {
+    .column {
+      width: 100%;
+      display: block;
+    }
+  }
+</style>
+
+{% endblock %}

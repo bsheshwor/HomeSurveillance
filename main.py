@@ -243,6 +243,22 @@ def search():
     return render_template('search.html',email=email, relation = relation)
 
 
+@app.route("/about")
+def abtus():
+    if "email" in session:
+        email = session["email"]
+        relation = session["relation"]
+    
+        return render_template("about.html", email=email, relation = relation)
+
+@app.route("/contact")
+def contact():
+    if "email" in session:
+        email = session["email"]
+        relation = session["relation"]
+        
+        return render_template("contact.html", email=email, relation = relation)
+
 
 # Flask views
 @app.route("/admin")

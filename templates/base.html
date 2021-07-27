@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title> {% block title %} {% endblock %}</title>
+   <title> {% block title %} Home Surveillance{% endblock %}</title>
     
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -35,20 +35,22 @@
         {% if email%}
         <h6 style="color: azure; font-size: 18px;font-family:'Nunito'; font-style: italic; margin: 0px; margin-right: 80px;">Hello, {{email}}</h6>
         <form class="custom__form-control" action="{{ url_for('search')}}" method="POST">
-            <input type="text" style="width: 100px;" placeholder="Search.." name="search">
+            <input type="text" style="width: 100px; text-align: center;" placeholder="Search.." name="search">
             <button type="submit"><i class="fa fa-search" style="width: 30px;"></i></button>   
         </form>
         {% endif %}
 
         <div class="dropdown">
+            {% if email %}
             <button class="dropbtn" style="display: flex; align-items: center; justify-content: center;"><span style="display: block;">Menu</span><span style=" display: block; margin-left: .5rem; transform: translateY(-8%);"><i class="fas fa-sort-down"></i></span></button>
+            {% endif %}
             <div class="dropdown-content">   
                 {% if relation == "admin"%}
                 <a href="admin">Admin</a>
                 {%endif%}
-                <a href="#">About Us</a>
-                <a href="#">Contact</a>
                 {% if email %}
+                <a href="about">About Us</a>
+                <a href="contact">Contact</a>
                 <a href="signout">Logout</a>
                 {%endif%}
             </div>
