@@ -189,9 +189,9 @@ class VideoCamera(object):
         msg['subject'] = subject
         msg['to'] = to
 
-        user = 'gaurabstha001@gmail.com'
+        user = 'BugDevelopers55@gmail.com'
         msg['from'] = user
-        password = 'pgvrykietyiugmxf'
+        password = 'ppejebvyyyipczby'
 
         with open('intruder.jpg', 'rb') as f:
             file_data = f.read()
