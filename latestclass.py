@@ -3,6 +3,7 @@ import gridfs
 import os
 from bson.objectid import ObjectId
 
+# initializing database
 client = MongoClient(port=27017)
 db = client.home_surveillance  # database new
 # code for storing image in a database
@@ -13,10 +14,7 @@ class Images():
     def __init__(self):
         self.fs = gridfs.GridFS(db)
         self.imageRel = db.imageRel
-
         self.imageInd = 0
-
-
 
 # empty the direcotry
     def clearDirectory(self,dir):
@@ -123,13 +121,3 @@ class Images():
 
 
 
-new = Images()
-# new.queryData('bises')
-# new.deleteData('bises')
-# new.getImages2('60b8703d4a52fd8b738276d7')
-
-# new.insertDataToDb('bises','self','banepa','/home/umesh/Projects/HomeSurveillance/','routine.png')
-# new.clearDirectory('static/temp/')
-# listmine= new.getImages('routine.png')
-# # print(listmine)
-# print(data['_id'])

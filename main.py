@@ -14,16 +14,17 @@ from flask_admin.contrib.pymongo import ModelView, filters
 from latestclass import Images
 
 
-
+# iniitlaizing flask app
 app = Flask(__name__)
 KEY = os.urandom(24)
 app.config["SECRET_KEY"] = KEY
 client = MongoClient(port=27017)
-db = client.home_surveillance  # database new
+db = client.home_surveillance
 records = db.records
+# initalizing bcrypt
 bcrypt = Bcrypt(app)
 
-# forms
+# forms for admin site
 class UserForm(form.Form):
     user = fields.StringField("Name")
     email = fields.StringField("Email")
@@ -36,18 +37,15 @@ class UserForm(form.Form):
 
 
 
-
+# generators for video streaming
 def gen(camera):
     while True:
         frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
 
-
+# app routes
 @app.route('/video')
 def video_feed():
     return Response(gen(VideoCamera()),
@@ -260,7 +258,7 @@ def contact():
         return render_template("contact.html", email=email, relation = relation)
 
 
-# Flask views
+# Flask views for admin panel
 @app.route("/admin")
 def adminPanel():
     return '<a href="/admin/">Click me to get to Admin!</a>'

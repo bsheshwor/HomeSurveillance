@@ -1,9 +1,5 @@
 import cv2
-import numpy as np
 import face_recognition
-import os
-from datetime import datetime
-import pandas as pd
 import numpy as np
 import smtplib
 from email.message import EmailMessage
@@ -14,30 +10,27 @@ import pygame
 pygame.mixer.init()
 
 
-
+# importing cascading model to detect face
 face_cascade = cv2.CascadeClassifier('models/haarcascade_frontalface_default.xml')
 
+# initializing database
 client = MongoClient(port=27017)
-
 db= client.home_surveillance #database new
 appData= db.appData
 imageRel= db.imageRel
 
-
+# function to play sound
 def play():
     pygame.mixer.music.load('static/ALert.wav')
     pygame.mixer.music.play(loops= 3)
 
-print('Data Extraction Complete')
-# cap = cv2.VideoCapture(0)
-
+# class to record new data
 class recordData(object):
     def __init__(self):
         # self.address ="http://192.168.0.100:8080/video"
         #self.address = "http://10.42.0.144:8080/video"
 
         self.video = cv2.VideoCapture(0)
-        # self.video = cv2.VideoCapture()
         self.no_of_faces = 0
 
     def __del__(self):
@@ -48,18 +41,15 @@ class recordData(object):
 
     def get_frame(self):
         success, img = self.video.read()
-        # cv2.imwrite('t.jpeg',img)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
         faces = face_cascade.detectMultiScale(gray, 1.1, 4)
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
-
         cv2.rectangle(img, ((0, img.shape[0] - 25)), (270, img.shape[0]), (255, 255, 255), -1)
         self.no_of_faces = len(faces)
+        # if faces detected
         if (self.no_of_faces==1):
             cv2.imwrite('t.jpeg', img)
-
         # if no face detect
         if (self.no_of_faces==0):
             cv2.putText(img, "NO Face DETECTED", (50, 50), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
@@ -77,24 +67,19 @@ class recordData(object):
 
 
 
+# class for surveillance camera
 class VideoCamera(object):
     def __init__(self):
-        # self.video = cv2.VideoCapture(1)
-        # self.address = "http://192.168.43.1:8080/video"
         self.address = "http://192.168.100.175:8080/video"
         self.video = cv2.VideoCapture(0)
-
-        self.faceData = []
+        self.faceData = []     # empty list to store all data from database
         for x in imageRel.find({}, {"_id": 0}):
             self.faceData.append(x)
 
-        # print(faceData)
-        self.face = []
-        self.namelist = []
+        self.face = []  #to store only the face encodings
+        self.namelist = []  #to store only names from the database
         for i in range(len(self.faceData)):
             self.namelist.append(self.faceData[i]['name'])
-
-        # print((faceData[0]['encodings']))
 
         print(self.namelist)
 
@@ -103,9 +88,6 @@ class VideoCamera(object):
             for j in range(128):
                 face_arr[j] = self.faceData[i]['encodings'][j]
             self.face.append(face_arr)
-
-        # self.vide.set(3, 640)
-        # self.vide.set(4, 480)
 
     def __del__(self):
         self.video.release()
