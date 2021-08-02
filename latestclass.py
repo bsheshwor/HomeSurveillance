@@ -47,7 +47,7 @@ class Images():
     def getImages2(self,myId,name):     
         self.clearDirectory('static/images')
         outputdata = self.fs.get(ObjectId(myId)).read()
-        location = 'static/images/'+ name +'.jpeg'
+        location = 'static/images/image' +'.jpeg'
         output = open(location,'wb')
         output.write(outputdata)
         output.close()

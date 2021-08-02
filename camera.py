@@ -27,10 +27,11 @@ def play():
 # class to record new data
 class recordData(object):
     def __init__(self):
-        # self.address ="http://192.168.0.100:8080/video"
-        #self.address = "http://10.42.0.144:8080/video"
+        self.address = "http://192.168.1.9:8080/video"
 
-        self.video = cv2.VideoCapture(0)
+        self.video = cv2.VideoCapture(self.address)
+
+
         self.no_of_faces = 0
 
     def __del__(self):
@@ -70,16 +71,22 @@ class recordData(object):
 # class for surveillance camera
 class VideoCamera(object):
     def __init__(self):
-        self.address = "http://192.168.100.175:8080/video"
+        # self.video = cv2.VideoCapture(1)
+        # self.address = "http://192.168.43.1:8080/video"
+        self.address = "http://10.42.0.144:8080/video"
         self.video = cv2.VideoCapture(0)
-        self.faceData = []     # empty list to store all data from database
+
+        self.faceData = []
         for x in imageRel.find({}, {"_id": 0}):
             self.faceData.append(x)
 
-        self.face = []  #to store only the face encodings
-        self.namelist = []  #to store only names from the database
+        print("faceData")
+        self.face = []
+        self.namelist = []
         for i in range(len(self.faceData)):
             self.namelist.append(self.faceData[i]['name'])
+
+        # print((faceData[0]['encodings']))
 
         print(self.namelist)
 
@@ -88,6 +95,10 @@ class VideoCamera(object):
             for j in range(128):
                 face_arr[j] = self.faceData[i]['encodings'][j]
             self.face.append(face_arr)
+
+        # self.vide.set(3, 640)
+        # self.vide.set(4, 480)
+
 
     def __del__(self):
         self.video.release()
@@ -128,7 +139,7 @@ class VideoCamera(object):
                 cv2.imwrite('intruder.jpg', img)
                 play()
 
-                self.memberentry_record(name)
+                # self.memberentry_record(name)
                 t = time.strftime("%Y-%m-%d_%H-%M-%S")
                 print("Unknown member detected, Alert!!")
 

@@ -234,7 +234,7 @@ def search():
             img = Images()
             details=img.queryData(query)
             print(query)
-            file = "images/"+query+".jpeg"
+            file = "images/"+'image'+".jpeg"
             print(file)
             if details:
                 return render_template('search.html',file= file, email=email, relation = relation, details = details)
